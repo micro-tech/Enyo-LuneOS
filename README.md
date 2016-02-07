@@ -1,10 +1,7 @@
-#webos-lib
+#enyo-luneos
 
-*A selection of enyo2 kinds to restore functionality missing from enyo1*
+A selection of Enyo controls and functionality ported from Enyo 1.0 for next-gen LuneOS devices, with backward support for legacy webOS devices.
 
-*Unified from webos-ports-lib, webOS-Ext & enyo1-to-enyo2 kinds by ShiftyAxel, Jason Robitaille and Arthur Thornton*
-
-**Full documentation can be found at [http://webos-ports.github.io/webos-lib/](http://webos-ports.github.io/webos-lib/)**
 
 ##AppMenu
 
@@ -12,27 +9,15 @@ Ported from Enyo 1, the AppMenu kind will replicate the behavior of the standard
 
 **Example:**
 
-	{kind:"AppMenu", onSelect: "appMenuItemSelected", components: [{content:"Do something", ontap: "doSomething"}]}
+	{kind:AppMenu, onSelect: "appMenuItemSelected", components: [{content:"Do something", ontap: "doSomething"}]}
 
 ##ApplicationEvents
 
-A convenient subkind of _enyo.Signals_ that outlines all of the webOS-specific events from webos-lib.
+A convenient subkind of _enyo/Signals_ that outlines all of the webOS-specific events from webos-lib.
 
 **Example:**
 
-     {kind: "enyo.ApplicationEvents", onbackbutton: "handleBackGesture", onactivate: "handleActivate", ondeactivate: "handleDeactivate", onmenubutton: "handleMenuButton", onrelaunch: "handleRelaunch", onlowmemory:"handleLowMemory", onvirtualkeyboard: "handleVirtualKeyboard"}
-
-
-##BackGesture
-
-A function that listens for the webOS Back Gesture and fires the onbackbutton signal. Both 2.x and Open webOS are supported, as well as phonegap and the Esc key on desktop browsers.
-
-You don't instantiate this in your app, you listen with an enyo.Signals (or enyo.ApplicationEvents).
-
-**Example:**
-
-     {kind: "enyo.Signals", onbackbutton: "handleBackGesture"}
-
+     {kind: ApplicationEvents, onbackgesture: "handleBackGesture", onactivate: "handleActivate", ondeactivate: "handleDeactivate", onmenubutton: "handleMenuButton", onwebOSLaunch: "handleLaunch", onwebOSRelaunch: "handleRelaunch", onlowmemory:"handleLowMemory", onvirtualkeyboard: "handleVirtualKeyboard"}
 	 
 ##CoreNavi
 
@@ -40,21 +25,17 @@ An in-app gesture area that can be used for debugging. Emulates the Open webOS b
 
      //KeyUp-based Gesture
      components: [
-     	{kind: "Signals", onkeyup: "handleKeyUp"},
-     	{kind: "CoreNavi", fingerTracking: false}
+     	{kind: Signals, onkeyup: "handleKeyUp"},
+     	{kind: CoreNavi, fingerTracking: false}
      ],
      handleKeyUp: function(inSender, inEvent) {
-	if(inEvent.keyIdentifier == "U+1200001") {
-		//Do Stuff
-	}
+     	if(inEvent.keyIdentifier == "U+1200001") {
+     		//Do Stuff
+     	}
      }
      
      //Finger Tracking API
      components: [
-     	{kind: "Signals",
-	onCoreNaviDragStart: "handleCoreNaviDragStart",
-	onCoreNaviDrag: "handleCoreNaviDrag",
-	onCoreNaviDragFinish: "handleCoreNaviDragFinish"}
      	{kind: "Panels",
      	arrangerKind: "CarouselArranger",
      	components:[
@@ -62,7 +43,12 @@ An in-app gesture area that can be used for debugging. Emulates the Open webOS b
      		{content: "Bar"},
      		{content: "DecafIsBad"},
      	]},
-     	{kind: "CoreNavi", fingerTracking: true}
+     	{kind: "CoreNavi",
+               fingerTracking: true,
+               onCoreNaviDragStart: "handleCoreNaviDragStart",
+               onCoreNaviDrag: "handleCoreNaviDrag",
+               onCoreNaviDragFinish: "handleCoreNaviDragFinish"
+          }
      ],
      handleCoreNaviDragStart: function(inSender, inEvent) {
      	this.$.CoreNaviPanels.dragstartTransition(inEvent);
@@ -82,8 +68,6 @@ An in-app gesture area that can be used for debugging. Emulates the Open webOS b
 Ported from the non-published set of Enyo 1 APIs to Enyo2, CrossAppUI takes a 'path' parameter (the HTML file to open) and displays it inside your application.
 The child application can pass stringified JSON prefixed with 'enyoCrossAppResult=' up to the CrossAppUI via the 'message' event (window scope). CrossAppUI will strip off the prefix, parse it into an object and fire onResult. This is intended to be used as a base class for app-in-app kinds, such as FilePicker (see below).
 
-Requires enyo.ServiceRequest, from the enyo-webos library.
-
 **message Event Example:**
 
      "enyoCrossAppResult={\"result\":[{\"fullPath\":\"/path/to/selected/file.foo\",\"iconPath\":\"/var/luna/extractfs//path/to/selected/file.foo:0:0:\",\"attachmentType\":\"image\",\"dbId\":\"++ILuOICkjNDQaUP\"}]}"
@@ -94,14 +78,11 @@ Requires enyo.ServiceRequest, from the enyo-webos library.
 
 **Example:**
 
-     {kind:"CrossAppUI", style: "width: 100%; height: 100%;", path: "/path/to/app/html.html", onResult: "handleResult"}
+     {kind:CrossAppUI, style: "width: 100%; height: 100%;", path: "/path/to/app/html.html", onResult: "handleResult"}
 
 ##FilePicker
 
 Ported across from Enyo 1, this is a CrossAppUI kind that points to the built-in webOS filepicker. The onPickFile event is called when the file is chosen.
-
-Requires enyo.ServiceRequest, from the enyo-webos library.
-
 
 **onPickFile Output:**
 
@@ -109,7 +90,7 @@ Requires enyo.ServiceRequest, from the enyo-webos library.
 
 **Example:**
 
-     {name: "ImagePicker", kind: "FilePicker", fileType:["image"], onPickFile: "selectedImageFile"}
+     {name: "ImagePicker", kind: FilePicker, fileType:["image"], onPickFile: "selectedImageFile"}
 
 ##HtmlContent
 
@@ -118,23 +99,7 @@ Like the Enyo 1 Control of the same name.
 
 **Example:**
 
-	{kind:"HtmlContent", content:"This content is<br />separated by an HTML line break (&lt;br /&gt;) tag"}
-
-##LunaBindings
-
-Binds LunaSysMgr application events to Enyo signals.
-	
->_onactivate_: When the window is activated<br>
->_ondeactivate_: When the window is deactivated<br>
->_onmenubutton_: When the app menu is toggled<br>
->_onrelaunch_: When the app is relaunched<br>
->_onlowmemory_: To monitor for high memory usage<br>
-
-You don't instantiate this in your app, you listen with an enyo.Signals (or enyo.ApplicationEvents).
-
-**Example:**
-
-	{kind: "enyo.Signals", onactivate: "handleActivate", ondeactivate: "handleDeactivate", onmenubutton: "handleMenuButton", onrelaunch: "handleRelaunch", onlowmemory:"handleLowMemory"}
+	{kind:HtmlContent, content:"This content is<br />separated by an HTML line break (&lt;br /&gt;) tag"}
 
 ##ModalDialog
 
@@ -142,14 +107,8 @@ Another kind ported from Enyo 1, this is an onyx.Popup that has `modal:true` and
 
 **Example:**
 
-	{name: "myDialog", kind:"ModalDialog", components[/* your components */, { kind: onyx.Button, content: "Close popup", ontap: "closePopup"}]}
+	{name: "myDialog", kind:ModalDialog, components[/* your components */, { kind: onyx.Button, content: "Close popup", ontap: "closePopup"}]}
 	closePopup: function() {this.$.myDialog.hide()};
-
-##PalmService
-
-_enyo.PalmService_ has been removed, in favor of enyo.LunaService in enyo-webos. 
-Your onResponse and onError functions must check the fields of inResponse, rather than inResponse.data.
-
 	
 ##PortsHeader
 
@@ -157,7 +116,7 @@ An onyx.Toolbar that displays the app icon, a custom title and an optional rando
 
 **Example:**
 
-     {kind: "PortsHeader",
+     {kind: PortsHeader,
      title: "FooApp",
      taglines: [
           "My foo-st app",
@@ -171,7 +130,7 @@ A variant of the PortsHeader that contains an animated, expandable search bar. o
 
 **Example:**
 
-     {kind: "PortsSearch",
+     {kind: PortsSearch,
      title: "SearchyFooApp",
      instant: false,
      submitCloses: true,
@@ -192,7 +151,7 @@ This is an enyo2 reimagining of the progress indicator from the webOS 2.x Browse
 **Example:**
 
      {name: "FooOrb",
-     kind: "ProgressOrb",
+     kind: ProgressOrb,
      style: "position: absolute; right: 8px; bottom: 8px;",
      content: "O",
      onButtonTap: "buttonTapped"},
@@ -200,31 +159,13 @@ This is an enyo2 reimagining of the progress indicator from the webOS 2.x Browse
 	this.$.FooOrb.setValue(this.$.FooOrb.value + 100);
      },
 
-##ServiceRequest
-
-_enyo.ServiceRequest has been removed, in favor of enyo.ServiceRequest in enyo-webos.
-That should be a drop-in replacement
-
-
 ##SymKey
 
 Static symkey functionality for webOS 1.x and 2.x.
 	
 When the symkey on the physical keyboard is pressed, this properly opens the
 symtable within webOS.  Automatically opens on the symkey, but can also be
-manually activated from `webos.showSymTable()`.
-
-Requires enyo.ServiceRequest, from the enyo-webos library.
-
-
-##VirtualKeyboard
-
-Collection of static webOS virtual keyboard functions and constants.	
-Sends an _onvirtualkeyboard_ signal that you can listen for.
-
-**Example:**
-
-	{kind: "enyo.Signals", onvirtualkeyboard: "handleVirtualKeyboard"}
+manually activated from `showSymTable()`.
 
 ##WebView
 
@@ -234,8 +175,21 @@ was slightly modified to enable it to work with Enyo 2. For complete documentati
 refer to [this document](https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.WebView)
 (ignore the Inheritance section and all other kinds)
 
-##webos.js
+------------
 
-A collection of static variables and functions core to webOS functionality
-and the webOS feature-set. A large amount of PalmSystem bindings combined
-with some utility functions.
+##LuneOS.js
+
+An extension of the [webOS.js](https://github.com/webOS-DevRel/webOS.js) script, providing 
+additional functionality and webOS API standardization. Like webOS.js, it does not strictly 
+require Enyo and can be used separate if desired. Feature focuses include:
+
+* Device orientation APIs
+* Utility APIs (clipboard, LED notification, textindexer, etc.)
+* Virtual keyboarc APIs
+* Window card APIs
+* WebOS event APIs (original events like backgesture, menubutton, etc.; polyfills formodern standard webOS events like webOSLaunch, webOSRelaunch, visibilitychange)
+
+-----------
+
+Unified from webOS-Ext, webos-ports-lib & enyo1-to-enyo2 kinds by Jason Robitaille, ShiftyAxel, and Arthur Thornton.
+Restructed and updated for optimum compatibility with modular Enyo 2.7 by Jason Robitaille.
