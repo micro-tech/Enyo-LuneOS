@@ -3,9 +3,10 @@
  * Like the Enyo 1 Control of the same name.
  */
 
-enyo.kind({
-	name: "enyo.HtmlContent",
-	kind: enyo.Control,
+var Control = require('enyo/Control');
+
+module.exports = Control.kind({
+	name: "luneos.HtmlContent",
 	tag: "div",
 	allowHtml: true
 });

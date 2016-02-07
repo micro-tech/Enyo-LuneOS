@@ -1,5 +1,10 @@
-enyo.kind({
-	name: "enyo.Pie",
+var
+	Control = require('enyo/Control'),
+	Animator = require('enyo/Animator'),
+	Button = require('onyx/Button');
+
+var Pie = Control.kind({
+	name: "luneos.Pie",
 	published: {
 		angle: 0,
 	},
@@ -39,8 +44,8 @@ enyo.kind({
 	},
 });
 
-enyo.kind({
-	name: "enyo.ProgressOrb",
+module.exports = Control.kind({
+	name: "luneos.ProgressOrb",
 	fit: true,
 	published: {
 		value: 0,
@@ -52,11 +57,11 @@ enyo.kind({
 		onButtonTap: ""
 	},
 	components:[
-		{name: "ProgressAnimator", kind: "Animator", duration: 500, onStep: "animatorStep"},
+		{name: "ProgressAnimator", kind: Animator, duration: 500, onStep: "animatorStep"},
 		{name: "OuterRing", style: "width: 90%; height: 90%; padding: 5%; background-color: #000; border-radius: 50%;", components:[
-			{name: "Pie", kind: "Pie", style: "position: absolute;"},
+			{name: "Pie", kind: Pie, style: "position: absolute;"},
 			{name: "CenterButton",
-			kind: "onyx.Button",
+			kind: Button,
 			classes: "onyx-toolbar",
 			style: "position: absolute; width:65%; height: 65%; margin: 12.5%; padding: 0; border-radius: 50%;",
 			ontap: "buttonTapped"}

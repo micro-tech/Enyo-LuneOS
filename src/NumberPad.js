@@ -1,10 +1,15 @@
-enyo.kind({
-	name: "enyo.NumberPad",
-	layoutKind: "FittableRowsLayout",
+var
+	Control = require('enyo/Control'),
+	FittableRowsLayout = require('layout/FittableLayout').Rows,
+	Button = require('onyx/Button');
+
+module.exports = Control.kind({
+	name: "luneos.NumberPad",
+	layoutKind: FittableRowsLayout,
 	events: {
 		onKeyTapped: ""
 	},
-	defaultKind: enyo.kind({kind: "onyx.Button",
+	defaultKind: enyo.kind({kind: Button,
 				classes: "onyx-toolbar",
 				style: "width: 33.3%; height: 25%; font-size: 32pt; font-weight: bold;",
 				ontap: "keyTapped"}),

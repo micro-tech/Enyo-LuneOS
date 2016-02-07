@@ -1,3 +1,5 @@
+require('enyo-luneos');
+
 /*
 	The code below was obtained from
 	https://github.com/enyojs/enyo-1.0/blob/master/framework/source/palm/controls/WebView.js; and
@@ -7,11 +9,20 @@
 	and modified as can be seen below to function as an Enyo 2.0 component.
 */
 
+var
+	Control = require('enyo/Control'),
+	Signals = require('enyo/Signals'),
+	job = require('enyo/job'),
+	dom = require('enyo/dom'),
+	utils = require('enyo/utils'),
+	dispatcher = require('enyo/dispatcher');
+
+
 //* @protected
 // FIXME: experimental, NOT currently used
 // in case we need to do weighted average 
 // for gestures like enyo1 does
-enyo.weightedAverage = {
+var weightedAverage = {
 	data: {},
 	count: 4,
 	weights: [1, 2, 4, 8],
@@ -37,10 +48,10 @@ enyo.weightedAverage = {
 	}
 };
 
+
 //* @protected
-enyo.kind({
-	name: "enyo.BasicWebView",
-	kind: enyo.Control,
+var BasicWebView = Control.kind({
+	name: "luneos.BasicWebView",
 	tag: "object",
 	//* @protected
 	published: {
@@ -69,7 +80,7 @@ enyo.kind({
 		oncopy: "copyHandler"
 	},
 	components: [
-		{kind: "enyo.Signals", onkeypress: "keypressHandler" }
+		{kind: Signals, onkeypress: "keypressHandler" }
 	],
 	requiresDomMousedown: true,
 	events: {
@@ -111,7 +122,7 @@ enyo.kind({
 		}
 		this.history = [];
 		this.callQueue = [];
-		this.dispatcher = enyo.dispatcher;
+		this.dispatcher = dispatcher;
 		/*
 		this.domAttributes.type = "application/x-palm-browser";
 		this.domAttributes["x-palm-cache-plugin"] = this.cacheAdapter;
@@ -135,9 +146,9 @@ enyo.kind({
 			this.node.eventListener = this;
 			// need to add event listeners for touch events for
 			// webkit to send them to browser adapter
-			this.node.addEventListener("touchstart", enyo.bind(this, "touchHandler"));
-			this.node.addEventListener("touchmove", enyo.bind(this, "touchHandler"));
-			this.node.addEventListener("touchend", enyo.bind(this, "touchHandler"));
+			this.node.addEventListener("touchstart", this.bindSafely("touchHandler"));
+			this.node.addEventListener("touchmove", this.bindSafely("touchHandler"));
+			this.node.addEventListener("touchend", this.bindSafely("touchHandler"));
 			this.history = [];
 			this.lastUrl = "";
 			if (this.adapterReady()) {
@@ -146,10 +157,10 @@ enyo.kind({
 		}
 	},
 	blurHandler: function() {
-		if (window.PalmSystem && !webos.isPhone()) {
+		if (window.PalmSystem && !webOS.isLegacyPhone()) {
 			window.PalmSystem.editorFocused(false, 0, 0);
 		}
-		if (webos.isPhone()) {
+		if (webOS.isLegacyPhone()) {
 			this.callBrowserAdapter("blur");
 		}
 	},
@@ -159,7 +170,7 @@ enyo.kind({
 	// check to make sure the adapter is ready to receive commands. when
 	// the node is hidden we cannot call adapter functions.
 	adapterReady: function() {
-		return this.hasNode() && (this.node.openURL || webos.isPhone());
+		return this.hasNode() && (this.node.openURL || webOS.isLegacyPhone());
 	},
 	// (browser adapter callback) we only get this if the view is initially
 	// hidden
@@ -177,7 +188,7 @@ enyo.kind({
 		if (this.adapterReady() && !this._serverConnected) {
 			this._connect();
 			/*
-			this._connectJob = enyo.job("browserserver-connect", enyo.bind(this, "connect"), 500);
+			this._connectJob = job("browserserver-connect", this.bindSafely("connect"), 500);
 		} else {
 			this._connectJob = null;
 			*/
@@ -188,7 +199,7 @@ enyo.kind({
 			this.node.setPageIdentifier(this.identifier || this.id);
 			this.node.connectBrowserServer();
 
-			if (webos.isPhone()) {
+			if (webOS.isLegacyPhone()) {
 				this.serverConnected();
 			}
 		} catch (e) {
@@ -241,11 +252,11 @@ enyo.kind({
 		
 		// if this.owner.owner.hasNode() then get paddings
 		this.owner.owner.hasNode() &&
-		  (ownerPaddingTop = enyo.dom.getComputedStyleValue(this.owner.owner.node, 'padding-top').replace('px', ''),
-		  ownerPaddingLeft = enyo.dom.getComputedStyleValue(this.owner.owner.node, 'padding-left').replace('px', ''),
-		  ownerPaddingRight = enyo.dom.getComputedStyleValue(this.owner.owner.node, 'padding-right').replace('px', ''),
-		  ownerPaddingBottom = enyo.dom.getComputedStyleValue(this.owner.owner.node, 'padding-bottom').replace('px', ''),
-		  ownerBorderWidth = enyo.dom.getComputedStyleValue(this.owner.owner.node, 'border-top-width').replace('px', ''));
+		  (ownerPaddingTop = dom.getComputedStyleValue(this.owner.owner.node, 'padding-top').replace('px', ''),
+		  ownerPaddingLeft = dom.getComputedStyleValue(this.owner.owner.node, 'padding-left').replace('px', ''),
+		  ownerPaddingRight = dom.getComputedStyleValue(this.owner.owner.node, 'padding-right').replace('px', ''),
+		  ownerPaddingBottom = dom.getComputedStyleValue(this.owner.owner.node, 'padding-bottom').replace('px', ''),
+		  ownerBorderWidth = dom.getComputedStyleValue(this.owner.owner.node, 'border-top-width').replace('px', ''));
 		
 		ownerBorderWidth = parseInt(ownerBorderWidth, 10);
 		
@@ -269,7 +280,7 @@ enyo.kind({
 		if (b.width && b.height) {
 			this.callBrowserAdapter("setVisibleSize", [b.width, b.height]);
 		}
-		if (webos.isPhone()) {
+		if (webOS.isLegacyPhone()) {
 			this.callBrowserAdapter("setViewportSize", [b.width, b.height]);
 		}
 	},
@@ -306,13 +317,13 @@ enyo.kind({
 		return true;
 	},
 	clickHandler: function(inSender, inEvent) {
-		if(webos.isPhone()) {
+		if(webOS.isLegacyPhone()) {
 			var rect = this.hasNode().getBoundingClientRect();
 			this.callBrowserAdapter("clickAt", [(-rect.left + inEvent.screenX) * window.zoomFactor, (-rect.top + inEvent.screenY) * window.zoomFactor, 0]);
 		}
 	},
 	keypressHandler: function(inSender, inEvent) {
-		if(webos.isPhone()) {
+		if(webOS.isLegacyPhone()) {
 			this.callBrowserAdapter("insertStringAtCursor", [String.fromCharCode(event.charCode)]);
 		}
 	},
@@ -407,13 +418,13 @@ enyo.kind({
 			this.flashPopup = this.createComponent({kind: "Popup", modal: true, style: "text-align:center", components: [{content: $L("Tap outside or pinch when finished")}]});
 			this.flashPopup.render();
 			if (this.flashPopup.hasNode()) {
-				this.flashTransitionEndHandler = enyo.bind(this, "flashPopupTransitionEndHandler");
+				this.flashTransitionEndHandler = this.bindSafely("flashPopupTransitionEndHandler");
 				this.flashPopup.node.addEventListener("webkitTransitionEnd", this.flashTransitionEndHandler, false);
 			}
 		}
 		this.flashPopup.applyStyle("opacity", 1);
 		this.flashPopup.openAtCenter();
-		enyo.job(this.id + "-hideFlashPopup", enyo.bind(this, "hideFlashLockedMessage"), 2000);
+		job(this.id + "-hideFlashPopup", this.bindSafely("hideFlashLockedMessage"), 2000);
 	},
 	hideFlashLockedMessage: function() {
 		this.flashPopup.addClass("enyo-webview-flashpopup-animate");
@@ -483,7 +494,7 @@ enyo.kind({
 	// input field is focused
 	editorFocused: function(inFocused, inFieldType, inFieldActions) {
 		if (window.PalmSystem) {
-			if (!webos.isPhone()) {
+			if (!webOS.isLegacyPhone()) {
 				if (inFocused) {
 					this.node.focus();
 				}
@@ -691,6 +702,9 @@ enyo.kind({
 		this.urlTitleChanged(inUrl, inTitle, inCanGoBack, inCanGoForward);
 	}
 });
+
+
+
 //* @public
 /**
 A control that shows web content with built-in scroller.
@@ -705,9 +719,8 @@ The URL to load can be specified when declaring the instance, or by calling setU
 		this.$.webView.setUrl(inUrl);
 	}
 */
-enyo.kind({
-	name: "enyo.WebView",
-	kind: enyo.Control,
+module.exports = Control.kind({
+	name: "luneos.WebView",
 	//* @public
 	published: {
 		/** page identifier, used to open new webviews for new window requests */
@@ -760,7 +773,7 @@ enyo.kind({
 	},
 	//* @private
 	components: [
-		{name: "view", kind: enyo.BasicWebView,
+		{name: "view", kind: BasicWebView,
 			onclick: "webviewClick",
 			onMousehold: "doMousehold",
 			onResized: "doResized",
@@ -846,7 +859,7 @@ enyo.kind({
 			this.openSelect(this._cachedSelectPopups[inId]);
 		} else {
 			//this.showSpinner();
-			enyo.asyncMethod(this, "createSelectPopup", inId, inItemsJson);
+			utils.asyncMethod(this, "createSelectPopup", inId, inItemsJson);
 		}
 	},
 	openSelect: function(inPopup) {
@@ -862,6 +875,9 @@ enyo.kind({
 		}
 	},
 	createSelectPopup: function(inId, inItemsJson) {
+		/*
+		 *	TODO: Implement basic PopupList kind
+		 */
 		var p = this._freeSelectPopups.pop();
 		if (!p) {
 			p = this.createComponent({kind: "PopupList", name: "select-" + inId, _webviewId: inId, _response: -1, onSelect: "selectPopupSelect", onClose: "selectPopupClose"});
@@ -870,7 +886,7 @@ enyo.kind({
 			p._response = -1;
 		}
 		var listItems = [];
-		var items = enyo.json.parse(inItemsJson);
+		var items = JSON.parse(inItemsJson);
 		for (var i = 0, c; c = items.items[i]; i++) {
 			listItems.push({caption: c.text, disabled: !c.isEnabled});
 		}
@@ -886,7 +902,7 @@ enyo.kind({
 	selectPopupClose: function(inSender) {
 		// MenuItem calls close then doSelect, so wait for the function
 		// to finish before replying to get the correct value.
-		enyo.asyncMethod(this, "selectPopupReply", inSender);
+		utils.asyncMethod(this, "selectPopupReply", inSender);
 	},
 	selectPopupReply: function(inSender) {
 		this.callBrowserAdapter("selectPopupMenuItem", [inSender._webviewId, inSender._response]);
@@ -898,7 +914,7 @@ enyo.kind({
 		var r = this._requestDisconnect;
 		if (!this._requestDisconnect) {
 			//this.showSpinner();
-			setTimeout(enyo.bind(this, "reinitialize"), 5000);
+			setTimeout(this.bindSafely("reinitialize"), 5000);
 		} else {
 			this._requestDisconnect = false;
 		}
@@ -1076,15 +1092,15 @@ enyo.kind({
 		});*/
 	},
 	gotSystemRedirects: function(inText, inXhr) {
-		var resp = inXhr && enyo.json.parse(inXhr.responseText);
+		var resp = inXhr && JSON.parse(inXhr.responseText);
 		var redirects = [];
 		for (var i=0,r;resp && resp.redirects && (r=resp.redirects[i]);i++) {
-			if (r.appId != enyo.fetchAppId()) {
+			if (r.appId != webOS.fetchAppId()) {
 				redirects.push({regex: r.url, enable: true, cookie: r.appId, type: 0});
 			}
 		}
 		for (i=0,r;resp && resp.commands && (r=resp.commands[i]);i++) {
-			if (r.appId != enyo.fetchAppId() && r.appId != "com.palm.app.browser") {
+			if (r.appId != webOS.fetchAppId() && r.appId != "com.palm.app.browser") {
 				redirects.push({regex: r.url, enable: true, cookie: r.appId, type: 1});
 			}
 		}

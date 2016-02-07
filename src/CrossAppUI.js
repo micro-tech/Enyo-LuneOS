@@ -1,18 +1,23 @@
 /**
  * Allows a sub-application to run in an IFRAME.
- * Require enyo.ServiceRequest from the enyo-webos library.
  */
-enyo.kind({
-	name: "enyo.CrossAppUI",
+
+var
+	Control = require('enyo/Control'),
+	ServiceRequest = require('enyo-webos/ServiceRequest'),
+	utils = require('enyo/utils');
+
+module.exports = Control.kind({
+	name: "luneos.CrossAppUI",
 	// TODO: Port enyo.Iframe class
 	tag: "iframe",
 	//* @private
 	style: "border: 0;",
-        published: {
-                appId: "", //* String. id of the app whose UI will be displayed.
-                path: "", //* String. Relative path from the target app's main index file to the index file to be displayed.
-                params: null //* Object, optional.  Window params for the target UI document.
-        },
+	published: {
+		appId: "", //* String. id of the app whose UI will be displayed.
+		path: "", //* String. Relative path from the target app's main index file to the index file to be displayed.
+		params: null //* Object, optional.  Window params for the target UI document.
+	},
 	events: {
 		onResult: "" //* Sent when a result is received from the cross-app UI.
 	},
@@ -21,8 +26,8 @@ enyo.kind({
 		this.inherited(arguments);
 		this.params = this.params || {};
 		this.appPath = "";
-		this.checkLoadBound = enyo.bind(this, "checkLoad");
-		this.handleMessageBound = enyo.bind(this, "handleMessage");
+		this.checkLoadBound = this.bindSafely("checkLoad");
+		this.handleMessageBound = this.bindSafely("handleMessage");
 		window.addEventListener('message', this.handleMessageBound);
 	},
 	destroy: function() {
@@ -40,7 +45,7 @@ enyo.kind({
 	appChanged: function() {
 		this.appPath = "";
 		if (this.appId) {
-			var request = new enyo.ServiceRequest({
+			var request = new ServiceRequest({
 				service: "palm://com.palm.applicationManager",
 				method: "getAppBasePath"
 			});
@@ -78,7 +83,7 @@ enyo.kind({
 			// empty app-path but truthy app means we should do nothing.
 			// If we have a target, send initial params in the URL, so they are immediately available.
 			if (targetPath) {
-				enyo.log("CrossAppUI: Loading cross-app UI at "+targetPath);
+				this.log("Loading cross-app UI at "+targetPath);
 				targetPath = targetPath+"?enyoWindowParams="+encodeURIComponent(JSON.stringify(this.params));
 				// Hack to watch the document load process, since sometimes the iframe fails to load.
 				if (!this._checkLoadTimerId) {
@@ -94,21 +99,21 @@ enyo.kind({
 		var doc = node && node.contentDocument;
 		this._checkLoadTimerId = undefined;
 		if(doc && doc.readyState === "complete" && doc.location.href === "about:blank" && this.path) {
-			console.log("CrossAppUI: checkLoad: Kicking iframe.");
+			this.log("Kicking iframe.");
 			this.pathChanged();
 		} else {
-			console.log("CrossAppUI: checkLoad: things look okay.");
+			this.log("things look okay.");
 		}
 	},
 	paramsChanged: function() {
 		// If we haven't been rendered yet, or are currently pointing somewhere useless, 
 		// no need to send new params via message, they will go in the URL.
 		if (this.path && this.hasNode() && this.hasNode().contentWindow) {
-			this.hasNode().contentWindow.postMessage("enyoWindowParams="+enyo.json.stringify(this.params), "*");
+			this.hasNode().contentWindow.postMessage("enyoWindowParams="+JSON.stringify(this.params), "*");
 		}
 	},
 	handleMessage: function(e) {
-		enyo.log(JSON.stringify(e.data));
+		this.log(JSON.stringify(e.data));
 		var label = "enyoCrossAppResult=";
 		// Only respond to cross-app result messages, and also verify that the message is from *our* iframe.
 		if (e.source === (this.hasNode() && this.hasNode().contentWindow) && e.data.indexOf(label) === 0) {

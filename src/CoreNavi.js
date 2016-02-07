@@ -1,13 +1,26 @@
-enyo.kind({
-	name: "CoreNavi",
+require('enyo-luneos');
+
+var
+	Control = require('enyo/Control'),
+	FittableColumnsLayout = require('layout/FittableLayout').Columns,
+	Image = require('enyo/Image');
+
+
+module.exports = Control.kind({
+	name: "luneos.CoreNavi",
+	events: {
+		onCoreNaviDragStart: "",
+		onCoreNaviDrag: "",
+		onCoreNaviDragFinish: ""
+	},
 	style: "background-color: black;",
-	layoutKind: "FittableColumnsLayout",
+	layoutKind: FittableColumnsLayout,
 	fingerTracking: false, //Use legacy keyEvents by default, set to true to enable finger-tracking events
 	showing: true,
 	components:[
 		{style: "width: 33%;"},
-		{kind: "Image",
-		src: "$lib/webos-lib/assets/lightbar.png",
+		{kind: Image,
+		src: "@../assets/lightbar.png",
 		fit: true,
 		style: "width: 33%; height: 24px; padding-top: 2px;",
 		ondragstart: "handleDragStart",
@@ -29,6 +42,7 @@ enyo.kind({
 				//Back Gesture
 				var evB = document.createEvent("HTMLEvents");
 				evB.initEvent("keyup", "true", "true");
+				evB.keyCode = 27;
 				evB.keyIdentifier = "U+1200001";
 				document.dispatchEvent(evB);
 			}
@@ -38,19 +52,19 @@ enyo.kind({
 		}
 		else {
 			//Custom drag event
-			enyo.Signals && enyo.Signals.send && enyo.Signals.send('onCoreNaviDragStart', inEvent);
+			this.doCoreNaviDragStart(inEvent);
 		}
 	},
 	handleDrag: function(inSender, inEvent) {
 		if(this.fingerTracking == true) {
 			//Custom drag event
-			enyo.Signals && enyo.Signals.send && enyo.Signals.send('onCoreNaviDrag', inEvent);
+			this.doCoreNaviDrag(inEvent);
 		}
 	},
 	handleDragFinish: function(inSender, inEvent) {
 		if(this.fingerTracking == true) {
 			//Custom drag event
-			enyo.Signals && enyo.Signals.send && enyo.Signals.send('onCoreNaviDragFinish', inEvent);
+			this.doCoreNaviDragFinish(inEvent);
 		}
 	},
 });

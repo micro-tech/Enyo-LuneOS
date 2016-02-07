@@ -1,15 +1,26 @@
-enyo.kind({
-	name: "enyo.AppMenu",
-	kind: onyx.Menu,
+require('enyo-luneos');
+
+var
+	Menu = require('onyx/Menu'),
+	MenuItem = require('onyx/MenuItem'),
+	Signals = require('enyo/Signals');
+
+var AppMenuItem = MenuItem.kind({
+	name: "luneos.AppMenuItem",
+	classes: "enyo-item"
+});
+
+module.exports = Menu.kind({
+	name: "luneos.AppMenu",
 	classes: "enyo-appmenu",
 	style: "overflow: hidden;",
-	defaultKind: "enyo.AppMenuItem",
+	defaultKind: AppMenuItem,
 	published: {
 		maxHeight: 400
 	},
 	components: [
 		{
-			kind: enyo.Signals,
+			kind: Signals,
 			onmenubutton: "toggle"
 		}
 	],
@@ -43,8 +54,4 @@ enyo.kind({
 	}
 });
 
-enyo.kind({
-	name: "enyo.AppMenuItem",
-	kind: onyx.MenuItem,
-	classes: "enyo-item"
-});
+module.exports.Item = AppMenuItem;

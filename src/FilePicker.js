@@ -17,9 +17,13 @@ The response object is an array of objects indicating chosen files:
 		...
 	]
 */
-enyo.kind({
-	name: "enyo.FilePicker",
-	kind: "onyx.Popup",
+
+var
+	Popup = require('onyx/Popup'),
+	CrossAppUI = require('./CrossAppUI');
+
+module.exports = Popup.kind({
+	name: "luneos.FilePicker",
 	style: "width: 100%; height: 80%;",
 	published: {
 		/** Optional string or array.  Limits displayed files to the given type (or types).  
@@ -49,7 +53,7 @@ enyo.kind({
 	scrim: true,
 	filePickerPath: "/usr/palm/applications/com.palm.systemui/app/FilePicker/filepicker.html",
 	components: [
-		{name: "CrossApp", kind:"CrossAppUI", style: "width: 100%; height: 100%;", onResult: "handleResult"}
+		{name: "CrossApp", kind:CrossAppUI, style: "width: 100%; height: 100%;", onResult: "handleResult"}
 	],
 	//* Activates the modal FilePicker UI.
 	pickFile: function() {

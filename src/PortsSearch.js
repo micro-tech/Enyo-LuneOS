@@ -1,6 +1,12 @@
-enyo.kind({
-	name: "PortsSearch",
-	kind: "PortsHeader",
+var
+	PortsHeader = require('./PortsHeader'),
+	Animator = require('enyo/Animator'),
+	Image = require('enyo/Image'),
+	InputDecorator = require('onyx/InputDecorator'),
+	Input = require('onyx/Input')
+
+module.exports = PortsHeader.kind({
+	name: "luneos.PortsSearch",
 	title: "WebOS Ports Search",
 	taglines: [
 		"Shiny search button, PRESS IT!",
@@ -9,8 +15,8 @@ enyo.kind({
 		onSearch: ""
 	},
 	components:[
-		{name: "SearchAnimator", kind: "Animator", onStep: "animatorStep", onStop: "animatorStop"},
-		{name: "Icon", kind: "Image", src: "icon.png", style: "height: 100%; margin: 0;"},
+		{name: "SearchAnimator", kind: Animator, onStep: "animatorStep", onStop: "animatorStop"},
+		{name: "Icon", kind: Image, src: "icon.png", style: "height: 100%; margin: 0;"},
 		{name: "TextDiv",
 		tag: "div",
 		style: "height: 100%; margin: 0;",
@@ -23,17 +29,17 @@ enyo.kind({
 			style: "display: block; margin: 0; font-size: 13px;"}
 		]},
 		{name: "SearchDecorator",
-		kind: "onyx.InputDecorator",
+		kind: InputDecorator,
 		style: "position: absolute; top: 10px; right: 8px; width: 32px; padding: 2px 4px 3px 3px; max-width: 100%; float: right", components:[
 			{name: "SearchInput",
 			id: "searchBox",
-			kind: "onyx.Input",
+			kind: Input,
 			selectOnFocus: false, //False initially to prevent focus-stealing
 			style: "width: 0;",
 			oninput: "inputChanged",
 			onblur: "closeSearch"},
 			{kind: "Image",
-			src: "$lib/webos-lib/assets/search-input-search.png",
+			src: "@../assets/search-input-search.png",
 			style: "width: 24px; height: 24px;",
 			onmousedown: "openSearch"}
 		]}

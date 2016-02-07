@@ -1,13 +1,16 @@
-enyo.kind({
-	name: "PortsHeader",
-	kind: "onyx.Toolbar",
+var
+	Toolbar = require('onyx/Toolbar'),
+	Image = require('enyo/Image');
+
+module.exports = Toolbar.kind({
+	name: "luneos.PortsHeader",
 	classes: "ports-header",
 	title: "WebOS Ports Header",
 	taglines: [
 		"Random Tagline Here.",
 	],
 	components:[
-		{kind: "Image", src: "icon.png", style: "height: 100%; margin: 0;"},
+		{kind: Image, src: "icon.png", style: "height: 100%; margin: 0;"},
 		{tag: "div",
 		style: "height: 100%; margin: 0 0 0 8px;",
 		components: [
