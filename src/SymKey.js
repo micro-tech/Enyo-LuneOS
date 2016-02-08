@@ -10,7 +10,7 @@ require('enyo-luneos');
 
 var
 	Component = require('enyo/Component'),
-	Signals = require('enyo/Signals')
+	Signals = require('enyo/Signals'),
 	ServiceRequest = require('enyo-webos/ServiceRequest'),
 	platform = require('enyo/platform');
 
@@ -44,7 +44,7 @@ var SymKey = Component.kind({
 		}
 	},
 	serviceFailure: function(inSender, inError) {
-		this.error(inError.errorText || "Unable to show symkey interface");
+		this.log(inError.errorText || "Unable to show symkey interface");
 	},
 	relaunch: function(inSender, inEvent) {
 		var altCharSelected = inEvent.detail.altCharSelected;

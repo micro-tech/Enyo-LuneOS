@@ -1,0 +1,39 @@
+{
+	"name": "enyo-luneos",
+	"version": "2.7.0",
+	"main": "index.js",
+	"moduleDir": "src",
+	"assets": [
+		"images/*.png",
+	],
+	"styles": [],
+	"description": "Enyo library for LuneOS-specific kinds and APIs.",
+	"scripts": {
+		"test": "./node_modules/.bin/gulp"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/enyojs/enyo-webos.git"
+	},
+	"contributors": [
+		{
+			"name": "Jason Robitaille",
+			"url": "https://github.com/JayCanuck"
+		},
+		{
+			"name": "Josh Palmer",
+			"url": "https://github.com/ShiftyAxel"
+		},
+		{
+			"name": "Arthur Thornton",
+			"url": "https://github.com/ArthurThornton"
+		}
+	],
+	"license": "Apache-2.0",
+	"homepage": "https://github.com/JayCanuck/enyo-luneos",
+	"devDependencies": {
+		"gulp": "^3.8.11",
+		"gulp-jshint": "^1.10.0",
+		"jshint-stylish": "^1.0.1"
+	}
+}

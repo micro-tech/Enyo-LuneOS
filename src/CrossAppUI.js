@@ -4,8 +4,7 @@
 
 var
 	Control = require('enyo/Control'),
-	ServiceRequest = require('enyo-webos/ServiceRequest'),
-	utils = require('enyo/utils');
+	ServiceRequest = require('enyo-webos/ServiceRequest');
 
 module.exports = Control.kind({
 	name: "luneos.CrossAppUI",
@@ -58,7 +57,7 @@ module.exports = Control.kind({
 	},
 	gotAppInfo: function(inResponse) {
 		if(!inResponse || !inResponse.returnValue) {
-			console.error("Could not get app path: "+(inResponse && inResponse.errorText));
+			this.log("Could not get app path: "+(inResponse && inResponse.errorText));
 			return;
 		}
 		this.appPath = inResponse.basePath;

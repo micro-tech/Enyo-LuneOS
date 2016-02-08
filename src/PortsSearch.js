@@ -1,22 +1,22 @@
 var
 	PortsHeader = require('./PortsHeader'),
 	Animator = require('enyo/Animator'),
-	Image = require('enyo/Image'),
+	EnyoImage = require('enyo/Image'),
 	InputDecorator = require('onyx/InputDecorator'),
-	Input = require('onyx/Input')
+	Input = require('onyx/Input');
 
 module.exports = PortsHeader.kind({
 	name: "luneos.PortsSearch",
 	title: "WebOS Ports Search",
 	taglines: [
-		"Shiny search button, PRESS IT!",
+		"Shiny search button, PRESS IT!"
 	],
 	events:{
 		onSearch: ""
 	},
 	components:[
 		{name: "SearchAnimator", kind: Animator, onStep: "animatorStep", onStop: "animatorStop"},
-		{name: "Icon", kind: Image, src: "icon.png", style: "height: 100%; margin: 0;"},
+		{name: "Icon", kind: EnyoImage, src: "icon.png", style: "height: 100%; margin: 0;"},
 		{name: "TextDiv",
 		tag: "div",
 		style: "height: 100%; margin: 0;",
@@ -38,8 +38,8 @@ module.exports = PortsHeader.kind({
 			style: "width: 0;",
 			oninput: "inputChanged",
 			onblur: "closeSearch"},
-			{kind: "Image",
-			src: "@../assets/search-input-search.png",
+			{kind: EnyoImage,
+			src: "@../images/search-input-search.png",
 			style: "width: 24px; height: 24px;",
 			onmousedown: "openSearch"}
 		]}
@@ -65,7 +65,7 @@ module.exports = PortsHeader.kind({
 		this.$.Icon.applyStyle("opacity", 1.0 - inSender.value);
 		this.$.TextDiv.applyStyle("opacity", 1.0 - inSender.value);
 		
-		if(this.$.SearchAnimator.getStartValue() == 0)
+		if(this.$.SearchAnimator.getStartValue() === 0)
 			this.$.SearchInput.focus();
 	},
 	animatorStop: function(inSender, inEvent) {
@@ -74,6 +74,6 @@ module.exports = PortsHeader.kind({
 		this.doSearch({value: this.$.SearchInput.getValue()});
 	},
 	searchActive: function() {
-		return this.$.SearchInput.getValue() != "";
+		return this.$.SearchInput.getValue() !== "";
 	}
 });

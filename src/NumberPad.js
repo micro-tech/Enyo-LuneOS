@@ -1,7 +1,7 @@
 var
 	Control = require('enyo/Control'),
 	FittableRowsLayout = require('layout/FittableLayout').Rows,
-	Button = require('onyx/Button');
+	OnyxButton = require('onyx/Button');
 
 module.exports = Control.kind({
 	name: "luneos.NumberPad",
@@ -9,7 +9,7 @@ module.exports = Control.kind({
 	events: {
 		onKeyTapped: ""
 	},
-	defaultKind: enyo.kind({kind: Button,
+	defaultKind: OnyxButton.kind({
 				classes: "onyx-toolbar",
 				style: "width: 33.3%; height: 25%; font-size: 32pt; font-weight: bold;",
 				ontap: "keyTapped"}),
@@ -25,7 +25,7 @@ module.exports = Control.kind({
 		{content: "9", style: "border-radius: 0;"},
 		{content: "*", style: "border-radius: 0 0 0 16px;"},
 		{content: "0", style: "border-radius: 0;"},
-		{content: "#", style: "border-radius: 0 0 16px 0;"},
+		{content: "#", style: "border-radius: 0 0 16px 0;"}
 	],
 	keyTapped: function(inSender) {
 		this.doKeyTapped({value: inSender.content});

@@ -3,7 +3,7 @@ require('enyo-luneos');
 var
 	Control = require('enyo/Control'),
 	FittableColumnsLayout = require('layout/FittableLayout').Columns,
-	Image = require('enyo/Image');
+	EnyoImage = require('enyo/Image');
 
 
 module.exports = Control.kind({
@@ -19,14 +19,14 @@ module.exports = Control.kind({
 	showing: true,
 	components:[
 		{style: "width: 33%;"},
-		{kind: Image,
-		src: "@../assets/lightbar.png",
+		{kind: EnyoImage,
+		src: "@../images/lightbar.png",
 		fit: true,
 		style: "width: 33%; height: 24px; padding-top: 2px;",
 		ondragstart: "handleDragStart",
 		ondrag: "handleDrag",
 		ondragfinish: "handleDragFinish"},
-		{style: "width: 33%;"},
+		{style: "width: 33%;"}
 	],
 	//Hide on hosts with a hardware gesture area
 	create: function() {
@@ -37,7 +37,7 @@ module.exports = Control.kind({
 	//CoreNaviDrag Event Synthesis
 	handleDragStart: function(inSender, inEvent) {
 		//Back Gesture
-		if(this.fingerTracking == false) {
+		if(this.fingerTracking === false) {
 			if(inEvent.xDirection == -1) {
 				//Back Gesture
 				var evB = document.createEvent("HTMLEvents");
@@ -56,15 +56,15 @@ module.exports = Control.kind({
 		}
 	},
 	handleDrag: function(inSender, inEvent) {
-		if(this.fingerTracking == true) {
+		if(this.fingerTracking === true) {
 			//Custom drag event
 			this.doCoreNaviDrag(inEvent);
 		}
 	},
 	handleDragFinish: function(inSender, inEvent) {
-		if(this.fingerTracking == true) {
+		if(this.fingerTracking === true) {
 			//Custom drag event
 			this.doCoreNaviDragFinish(inEvent);
 		}
-	},
+	}
 });

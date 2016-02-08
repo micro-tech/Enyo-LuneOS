@@ -6,7 +6,7 @@ var
 var Pie = Control.kind({
 	name: "luneos.Pie",
 	published: {
-		angle: 0,
+		angle: 0
 	},
 	style: "width: 90%; height: 90%;",
 	components:[
@@ -15,11 +15,11 @@ var Pie = Control.kind({
 		classes: "pie pie-background"},
 		{name: "LeftMask", classes: "pie", components:[
 			{name: "PieLeftHalf",
-			classes: "pie pie-foreground"},
+			classes: "pie pie-foreground"}
 		]},
 		{name: "RightMask", classes: "pie", components:[
 			{name: "PieRightHalf",
-			classes: "pie pie-foreground"},
+			classes: "pie pie-foreground"}
 		]}
 	],
 	rendered: function() {
@@ -41,7 +41,7 @@ var Pie = Control.kind({
 	applyRotation: function() {
 		this.$.PieRightHalf.addStyles("-webkit-transform: rotateZ(" + Math.min(this.angle - 180, 0) + "deg);");
 		this.$.PieLeftHalf.addStyles("-webkit-transform: rotateZ(" + Math.max(this.angle, 180) + "deg);");
-	},
+	}
 });
 
 module.exports = Control.kind({
@@ -77,7 +77,7 @@ module.exports = Control.kind({
 	},
 	valueChanged: function() {
 		var val = this.$.ProgressAnimator.value;
-		this.$.ProgressAnimator.setStartValue(val != undefined ? val : 0);
+		this.$.ProgressAnimator.setStartValue(val !== undefined ? val : 0);
 		this.$.ProgressAnimator.setEndValue(this.value);
 		this.$.ProgressAnimator.play();
 	},
@@ -93,8 +93,8 @@ module.exports = Control.kind({
 		var scalar = ((scaleRange * (inSender.value - valueMin)) / valueRange) + scaleMin;
 	
 		//Clamp
-		var scalar = Math.max(Math.min(scalar, scaleMax), scaleMin);
-		var angle = 360 * scalar
+		scalar = Math.max(Math.min(scalar, scaleMax), scaleMin);
+		var angle = 360 * scalar;
 	
 		this.$.Pie.setAngle(angle);
 	}

@@ -12,6 +12,7 @@ require('enyo-luneos');
 var
 	Control = require('enyo/Control'),
 	Signals = require('enyo/Signals'),
+	Popup = require('onyx/Popup'),
 	job = require('enyo/job'),
 	dom = require('enyo/dom'),
 	utils = require('enyo/utils'),
@@ -22,7 +23,7 @@ var
 // FIXME: experimental, NOT currently used
 // in case we need to do weighted average 
 // for gestures like enyo1 does
-var weightedAverage = {
+/*var weightedAverage = {
 	data: {},
 	count: 4,
 	weights: [1, 2, 4, 8],
@@ -46,7 +47,7 @@ var weightedAverage = {
 	clear: function(inKind) {
 		this.data[inKind] = [];
 	}
-};
+};*/
 
 
 //* @protected
@@ -346,10 +347,10 @@ var BasicWebView = Control.kind({
 		this._redirectsChanged(this.redirects, inOldRedirects);
 	},
 	_redirectsChanged: function(inRedirects, inOldRedirects) {
-		for (var i=0, r; r=inOldRedirects && inOldRedirects[i]; i++) {
+		for (var i=0, r; (r=inOldRedirects) && inOldRedirects[i]; i++) {
 			this.callBrowserAdapter("addUrlRedirect", [r.regex, false, r.cookie, r.type || 0]);
 		}
-		for (i=0, r; r=inRedirects[i]; i++) {
+		for (i=0, r; (r=inRedirects[i]); i++) {
 			this.callBrowserAdapter("addUrlRedirect", [r.regex, r.enable, r.cookie, r.type || 0]);
 		}
 	},
@@ -391,7 +392,7 @@ var BasicWebView = Control.kind({
 	callBrowserAdapter: function(inFuncName, inArgs) {
 		if (this.adapterReady() && this._serverConnected) {
 			// flush the call queue first
-			for (var i=0,q; q=this.callQueue[i]; i++) {
+			for (var i=0,q; (q=this.callQueue[i]); i++) {
 				this._callBrowserAdapter(q.name, q.args);
 			}
 			this.callQueue = [];
@@ -408,14 +409,14 @@ var BasicWebView = Control.kind({
 		if (this.node[inFuncName]) {
 			this.node[inFuncName].apply(this.node, inArgs);
 		} else {
-			this.error("No method ", inFuncName, " on browserAdapter");
+			this.log("No method ", inFuncName, " on browserAdapter");
 		}
 	},
 	showFlashLockedMessage: function() {
 		if (this.flashPopup == null) {
 			// Note: the html break in the message is intentional
 			// (requested by HI)
-			this.flashPopup = this.createComponent({kind: "Popup", modal: true, style: "text-align:center", components: [{content: $L("Tap outside or pinch when finished")}]});
+			this.flashPopup = this.createComponent({kind: Popup, modal: true, style: "text-align:center", components: [{content: "Tap outside or pinch when finished"}]});
 			this.flashPopup.render();
 			if (this.flashPopup.hasNode()) {
 				this.flashTransitionEndHandler = this.bindSafely("flashPopupTransitionEndHandler");
@@ -887,7 +888,7 @@ module.exports = Control.kind({
 		}
 		var listItems = [];
 		var items = JSON.parse(inItemsJson);
-		for (var i = 0, c; c = items.items[i]; i++) {
+		for (var i = 0, c; (c = items.items[i]); i++) {
 			listItems.push({caption: c.text, disabled: !c.isEnabled});
 		}
 		p.setItems(listItems);
