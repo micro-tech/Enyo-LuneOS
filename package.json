@@ -4,7 +4,7 @@
 	"main": "index.js",
 	"moduleDir": "src",
 	"assets": [
-		"images/*.png",
+		"images/*.png"
 	],
 	"styles": [],
 	"description": "Enyo library for LuneOS-specific kinds and APIs.",
