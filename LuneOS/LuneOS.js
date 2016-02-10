@@ -8,10 +8,10 @@
 */
 
 // LuneOS.js initialization
-(function() {
+(function () {
 
 	// webOS.js verification/init
-	if(!window.webOS) {
+	if (!window.webOS) {
 		console.warn('WARNING: webOS.js missing. Will attempt to continue.');
 		window.webOS = {};
 	}
@@ -21,7 +21,7 @@
 	window.Mojo = window.Mojo || {};
 
 	// platform verification
-	if(window.navigator.userAgent.toLowerCase().indexOf('lunos')>=0) {
+	if (window.navigator.userAgent.toLowerCase().indexOf('lunos') >= 0) {
 		webOS.platform.luneos = true;
 	}
 
@@ -30,16 +30,17 @@
 
 /* ============================================================================
 	Device Orientation APIs
-*/ ============================================================================
-(function() {
+   ============================================================================
+ */
+(function () {
 
 	webOS.orientation = {
 		/**
 		 * Set the current window orientation, if supported
 		 * @param {string} orientation - One of 'up', 'down', 'left', 'right', or 'free'.
 		 */
-		setOrientation: function(orientation) {
-			if(window.PalmSystem && PalmSystem.setWindowOrientation) {
+		setOrientation: function (orientation) {
+			if (window.PalmSystem && PalmSystem.setWindowOrientation) {
 				PalmSystem.setWindowOrientation(orientation);
 			}
 		},
@@ -48,8 +49,8 @@
 		 * Returns the current window orientation
 		 * @return {string} Orientation is one of 'up', 'down', 'left', 'right', or 'free'
 		 */
-		getOrientation: function() {
-			if(window.PalmSystem && PalmSystem.setWindowOrientation) {
+		getOrientation: function () {
+			if (window.PalmSystem && PalmSystem.setWindowOrientation) {
 				return PalmSystem.windowOrientation;
 			} else {
 				return "up";
@@ -62,13 +63,14 @@
 
 /* ============================================================================
 	Utility APIs
-*/ ============================================================================
-(function() {
+   ============================================================================
+ */
+(function () {
 
 	webOS.util = {
-		isLegacyPhone: function() {
+		isLegacyPhone: function () {
 			return !webOS.keyboard;
-		
+
 		},
 		/**
 			Searches _inText_ for URLs (web and mailto) and emoticons (if supported),
@@ -113,35 +115,36 @@
 
 /* ============================================================================
 	Virtual Keyboard APIs
-*/ ============================================================================
-(function() {
+   ============================================================================
+*/
+(function () {
 
 	// virtual keyboard detection
 	var hasVKeyboard = true;
 	try {
-		if(webOS.platform.legacy &&
-				webOS.device.platformVersionMajor &&
-				window.PalmSystem && window.PalmSystem.deviceInfo) {
+		if (webOS.platform.legacy &&
+			webOS.device.platformVersionMajor &&
+			window.PalmSystem && window.PalmSystem.deviceInfo) {
 			var di = JSON.parse(PalmSystem.deviceInfo);
-			if(parseInt(di.platformVersionMajor)<3) {
+			if (parseInt(di.platformVersionMajor) < 3) {
 				hasVKeyboard = false;
 			}
 		}
-	} catch(e) {}
+	} catch (e) { }
 
-	if(hasVKeyboard) {
+	if (hasVKeyboard) {
 		var state = {};
 
 		
 		//Mojo LunaSysMgr hook for detecting keyboard shown
-		Mojo.keyboardShown = function(inKeyboardShowing) {
+		Mojo.keyboardShown = function (inKeyboardShowing) {
 			state.isShowing = inKeyboardShowing;
 			var evt = document.createEvent('HTMLEvents');
 			evt.initEvent("virtualkeyboard", false, false);
 			evt.showing = inKeyboardShowing;
 			document.dispatchEvent(evt);
 		};
-		
+
 		webOS.keyboard = {
 			/**
 			 * Virtual keyboard type constants
@@ -173,7 +176,7 @@
 			 * Returns whether or not the virtual keyboard is currently displayed
 			 * @return {boolean} Virtual keyboard visibility.
 			 */
-			isShowing: function() {
+			isShowing: function () {
 				return state.isShowing || false;
 			},
 		
@@ -181,8 +184,8 @@
 			 * Shows the virtual keyboard
 			 * @param {webOS.keyboard.types|number} [type=webOS.keyboard.types.text] - Type of virtual keyboard to display; from webOS.keyboard.types constants.
 			 */
-			show: function(type){
-				if(this.isManualMode() && window.PalmSystem && PalmSystem.keyboardShow) {
+			show: function (type) {
+				if (this.isManualMode() && window.PalmSystem && PalmSystem.keyboardShow) {
 					PalmSystem.keyboardShow(type || 0);
 				}
 			},
@@ -190,8 +193,8 @@
 			/**
 			 * Hides the virtual keyboard
 			 */
-			hide: function(){
-				if(this.isManualMode() && window.PalmSystem && PalmSystem.keyboardHide) {
+			hide: function () {
+				if (this.isManualMode() && window.PalmSystem && PalmSystem.keyboardHide) {
 					PalmSystem.keyboardHide();
 				}
 			},
@@ -200,9 +203,9 @@
 			 * Enables/disables manual mode for the virtual keyboard
 			 * @param {boolean} mode - If true, keyboard must be manually forced shown/hidden. If false, it's automatic.
 			 */
-			setManualMode: function(mode){
+			setManualMode: function (mode) {
 				state.manual = mode;
-				if(window.PalmSystem && PalmSystem.setManualKeyboardEnabled) {
+				if (window.PalmSystem && PalmSystem.setManualKeyboardEnabled) {
 					PalmSystem.setManualKeyboardEnabled(mode);
 				}
 			},
@@ -211,7 +214,7 @@
 			 * Whether or not manual mode is set for the virtual keyboard
 			 * @return {boolean} Manual mode status
 			 */
-			isManualMode: function(){
+			isManualMode: function () {
 				return state.manual || false;
 			},
 		
@@ -219,9 +222,9 @@
 			 * Force the virtual keyboard to show. In the process, enables manual mode.
 			 * @param {webOS.keyboard.types|number} [type=webOS.keyboard.types.text] - Type of virtual keyboard to display; from webOS.keyboard.types constants.
 			 */
-			forceShow: function(inType){
+			forceShow: function (inType) {
 				this.setManualMode(true);
-				if(window.PalmSystem && PalmSystem.keyboardShow) {
+				if (window.PalmSystem && PalmSystem.keyboardShow) {
 					PalmSystem.keyboardShow(inType || 0);
 				}
 			},
@@ -229,9 +232,9 @@
 			/**
 			 * Force the virtual keyboard to hide. In the process, enables manual mode.
 			 */
-			forceHide: function(){
+			forceHide: function () {
 				this.setManualMode(true);
-				if(window.PalmSystem && PalmSystem.keyboardHide) {
+				if (window.PalmSystem && PalmSystem.keyboardHide) {
 					PalmSystem.keyboardHide();
 				}
 			},
@@ -285,7 +288,7 @@
 			/**
 			 * Pastes any content in the clipboard.
 			 */
-			pasteClipboard: function() {
+			pasteClipboard: function () {
 				if (window.PalmSystem && PalmSystem.paste) {
 					PalmSystem.paste();
 				}
@@ -298,8 +301,9 @@
 
 /* ============================================================================
 	Window Card APIs
-*/ ============================================================================
-(function() {
+   ============================================================================
+*/
+(function () {
 
 	webOS.window = {
 		/**
@@ -307,9 +311,9 @@
 		 * @param {object} [inWindow=window] - A window object to reference from, otherwise current window.
 		 * @return {object} Launch parameters
 		 */
-		launchParams: function(inWindow) {
+		launchParams: function (inWindow) {
 			inWindow = inWindow || window;
-			if(inWindow.PalmSystem) {
+			if (inWindow.PalmSystem) {
 				return JSON.parse(inWindow.PalmSystem.launchParams || "{}") || {};
 			}
 			return {};
@@ -320,9 +324,9 @@
 		 * @param {object} [inWindow=window] - A window object to reference from; if omitted, uses current window.
 		 * @return {boolean} Activated status
 		 */
-		isActivated: function(inWindow) {
+		isActivated: function (inWindow) {
 			inWindow = inWindow || window;
-			if(inWindow.PalmSystem) {
+			if (inWindow.PalmSystem) {
 				return inWindow.PalmSystem.isActivated;
 			}
 			return false;
@@ -332,9 +336,9 @@
 		 * Tell webOS to activate the current page of your app, bringing it into focus.
 		 * @param {object} [inWindow=window] - A window object to reference from; if omitted, uses current window.
 		 */
-		activate: function(inWindow) {
+		activate: function (inWindow) {
 			inWindow = inWindow || window;
-			if(inWindow.PalmSystem && inWindow.PalmSystem.activate) {
+			if (inWindow.PalmSystem && inWindow.PalmSystem.activate) {
 				inWindow.PalmSystem.activate();
 			}
 		},
@@ -343,9 +347,9 @@
 		 * Tell webOS to deactivate your app.
 		 * @param {object} [inWindow=window] - A window object to reference from; if omitted, uses current window.
 		 */
-		deactivate: function(inWindow) {
+		deactivate: function (inWindow) {
 			inWindow = inWindow || window;
-			if(inWindow.PalmSystem && inWindow.PalmSystem.deactivate) {
+			if (inWindow.PalmSystem && inWindow.PalmSystem.deactivate) {
 				inWindow.PalmSystem.deactivate();
 			}
 		},
@@ -356,15 +360,15 @@
 		 * @param {string} [html] - HTML code to inject into the new card's window.
 		 * @return {object} Window object of the child window for the new card
 		 */
-		newCard: function(url, html) {
-			if(!url && !(webOS.platform.legacy || webOS.platform.open)) {
+		newCard: function (url, html) {
+			if (!url && !(webOS.platform.legacy || webOS.platform.open)) {
 				url = "about:blank";
 			}
 			var child = window.open(url);
-			if(html) {
+			if (html) {
 				child.document.write(html);
 			}
-			if(child.PalmSystem && child.PalmSystem.stageReady) {
+			if (child.PalmSystem && child.PalmSystem.stageReady) {
 				child.PalmSystem.stageReady();
 			}
 			return child;
@@ -374,9 +378,9 @@
 		 * Enable or disable full screen display.
 		 * @param {boolean} state - Whether to enable or disable full screen mode
 		 */
-		setFullScreen: function(state) {
+		setFullScreen: function (state) {
 			// valid state values are: true or false
-			if(window.PalmSystem && PalmSystem.enableFullScreenMode) {
+			if (window.PalmSystem && PalmSystem.enableFullScreenMode) {
 				PalmSystem.enableFullScreenMode(state);
 			}
 		},
@@ -389,12 +393,12 @@
 		 * @param {boolean} [inProps.setSubtleLightbar] - If true, the light bar will be made somewhat dimmer than normal. If false, it will return to normal.
 		 * @param {boolean} [inProps.fastAccelerometer] - If true, the accelerometer rate will increase to 30 hz; false by default, rate is at 4 hz. Note fast rate is active only for apps when maximized.
 		 */
-		setWindowProperties: function(inWindow, inProps) {
-			if(arguments.length==1) {
+		setWindowProperties: function (inWindow, inProps) {
+			if (arguments.length == 1) {
 				inProps = inWindow;
 				inWindow = window;
 			}
-			if(inWindow.PalmSystem && inWindow.PalmSystem.setWindowProperties) {
+			if (inWindow.PalmSystem && inWindow.PalmSystem.setWindowProperties) {
 				inWindow.webOS.window.properties = inProps = inProps || {};
 				inWindow.PalmSystem.setWindowProperties(inProps);
 			}
@@ -405,7 +409,7 @@
 		 * @param {object} [inWindow=window] - A window object to reference from; if omitted, uses current window.
 		 * @return {object} Application window properties that have been set thus far.
 		 */
-		getWindowProperties: function(inWindow) {
+		getWindowProperties: function (inWindow) {
 			inWindow = inWindow || window;
 			inWindow.webOS.window.properties = inWindow.webOS.window.properties || {};
 			return inWindow.webOS.window.properties;
@@ -415,7 +419,7 @@
 		 * Enable or disable screen timeout. When enabled, the device screen will not dim.
 		 * @param {boolean} state - Whether or not to block screen timeout
 		 */
-		blockScreenTimeout: function(state) {
+		blockScreenTimeout: function (state) {
 			webOS.window.properties.blockScreenTimeout = state;
 			this.setWindowProperties(navigator.windowProperties);
 		},
@@ -424,7 +428,7 @@
 		 * Sets the lightbar to be a little dimmer for screen locked notifications.
 		 * @param {boolean} state - Whether or not to dim the lightbar
 		 */
-		setSubtleLightbar: function(state) {
+		setSubtleLightbar: function (state) {
 			webOS.window.properties.setSubtleLightbar = state;
 			this.setWindowProperties(webOS.window.properties);
 		},
@@ -433,7 +437,7 @@
 		 * Enable/disable fast accelerometer update rates.
 		 * @param {boolean} state - When false, accelerometer updates at 4Hz; when enabled, updates at 30Hz
 		 */
-		setFastAccelerometer: function(state) {
+		setFastAccelerometer: function (state) {
 			webOS.window.properties.fastAccelerometer = state;
 			this.setWindowProperties(webOS.window.properties);
 		}
@@ -444,15 +448,16 @@
 
 /* ============================================================================
 	Event API Setup
-*/ ============================================================================
-(function() {
+   ============================================================================
+*/
+(function () {
 
-	if(webOS.platform.legacy || webOS.platform.open || webOS.platform.luneos) {
-		var fireDocumentEvent = function(type, data) {
+	if (webOS.platform.legacy || webOS.platform.open || webOS.platform.luneos) {
+		var fireDocumentEvent = function (type, data) {
 			var evt = document.createEvent('HTMLEvents');
 			evt.initEvent(type, false, false);
-			for(var i in data) {
-				if(data.hasOwnProperty(i)) {
+			for (var i in data) {
+				if (data.hasOwnProperty(i)) {
 					evt[i] = data[i];
 				}
 			}
@@ -461,24 +466,24 @@
 
 		// emulate webOSlaunch events on old devices
 		var lp = webOS.window.launchParams();
-		fireDocumentEvent("webOSLaunch", {detail:lp});
+		fireDocumentEvent("webOSLaunch", { detail: lp });
 
-		window.Mojo.relaunch = function(e) {
+		window.Mojo.relaunch = function (e) {
 			var lp = webOS.window.launchParams();
-			if(lp['palm-command'] && lp['palm-command'] == 'open-app-menu') {
+			if (lp['palm-command'] && lp['palm-command'] == 'open-app-menu') {
 				// emulate "menubutton" event
 				fireDocumentEvent("menubutton", {});
 				return true;
 			} else {
 				// emulate "webOSRelaunch" event with parameters
-				fireDocumentEvent("webOSRelaunch", {detail:lp});
+				fireDocumentEvent("webOSRelaunch", { detail: lp });
 			}
 		};
 
 		// clear any existing listeners; emulate page visibility events for card activate/deactivate
 		window.onpageshow = window.onpagehide = window.onfocus = window.onblur = undefined;
 
-		Mojo.stageActivated = function() {
+		Mojo.stageActivated = function () {
 			// fire "activate" event
 			fireDocumentEvent("activate", {});
 
@@ -487,10 +492,10 @@
 				document.hidden = false;
 				document.visibilityState = "visible";
 				fireDocumentEvent("visibilitychange", {});
-			} catch(e) {}
+			} catch (e) { }
 		};
 
-		Mojo.stageDeactivated = function() {
+		Mojo.stageDeactivated = function () {
 			// fire "deactivate" event
 			fireDocumentEvent("deactivate", {});
 
@@ -499,27 +504,27 @@
 				document.hidden = true;
 				document.visibilityState = "hidden";
 				fireDocumentEvent("visibilitychange", {});
-			} catch(e) {}
+			} catch (e) { }
 		};
 
 		// emulate "backbutton" event
-		document.addEventListener('keyup', function(ev) {
+		document.addEventListener('keyup', function (ev) {
 			if (ev.keyCode == 27 || ev.keyIdentifier == "U+1200001"
-					|| ev.keyIdentifier == "U+001B" || ev.keyIdentifier == "Back") {
+				|| ev.keyIdentifier == "U+001B" || ev.keyIdentifier == "Back") {
 				fireDocumentEvent("backgesture", ev);
 			}
 		});
 
 		// LunaSysMgr calls this when a KeepAlive app's window is shown
 		// Only used by webOS builtin system apps
-		Mojo.show = function() {
+		Mojo.show = function () {
 			// fire "appshow" event
 			fireDocumentEvent("appshow", {});
 		};
 		
 		// LunaSysMgr calls this when a KeepAlive app's window is hidden
 		// Only used by webOS builtin system apps
-		Mojo.hide = function() {
+		Mojo.hide = function () {
 			// fire "appshow" event
 			fireDocumentEvent("apphide", {});
 		};
@@ -527,9 +532,9 @@
 		// Applications that use significant memory can watch for this event and try to reduce
 		// their memory usage when they see a non-normal state. This has a `state` property
 		// with the value "low", "critical", or "normal".
-		Mojo.lowMemoryNotification = function(params) {
+		Mojo.lowMemoryNotification = function (params) {
 			// fire "lowmemory" event
-			fireDocumentEvent("lowmemory", {state: params.state});
+			fireDocumentEvent("lowmemory", { state: params.state });
 		};
 	}
 
@@ -538,11 +543,11 @@
 
 /* ============================================================================
 	StageReady Initialization
-*/ ============================================================================
-
+   ============================================================================
+*/
 //set the application to ready
-if(window.PalmSystem && window.PalmSystem.stageReady) {
-	window.addEventListener("load", function() {
+if (window.PalmSystem && window.PalmSystem.stageReady) {
+	window.addEventListener("load", function () {
 		setTimeout(function () {
 			window.PalmSystem.stageReady();
 		}, 1);
